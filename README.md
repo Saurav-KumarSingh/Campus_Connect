@@ -24,15 +24,15 @@ Many alumni struggle to stay connected with their university and fellow graduate
 
 ## App Features
 
-# Profile Creation
+### Profile Creation
 
 Users can create and edit their profiles, including name, graduation year, skills, interests, and career aspirations.
 
-# News Feed
+### News Feed
 
 A shared space where users can post updates, share thoughts, and ask questions, fostering a sense of community.
 
-# Group Creation
+### Group Creation
 
 Users can create or join groups based on interests, departments, or graduation year, promoting focused discussions and networking.
 
