@@ -42,7 +42,18 @@ class _ChatScreenState extends State<ChatScreen> {
     final currentUser = _auth.currentUser;
     if (_currentAdmissionNo == null) {
       return Scaffold(
-        appBar: AppBar(title: Text("Group Chat")),
+        appBar: AppBar(
+          title: Text("Group Chat", style: TextStyle(color: Colors.white)),
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.blueAccent, Colors.deepOrangeAccent],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+          ),
+        ),
         body: Center(child: CircularProgressIndicator()),
       );
     }
@@ -52,7 +63,18 @@ class _ChatScreenState extends State<ChatScreen> {
       builder: (context, groupSnapshot) {
         if (!groupSnapshot.hasData) {
           return Scaffold(
-            appBar: AppBar(title: Text("Group Chat")),
+            appBar: AppBar(
+              title: Text("Group Chat", style: TextStyle(color: Colors.white)),
+              flexibleSpace: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.blueAccent, Colors.deepOrangeAccent],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+              ),
+            ),
             body: Center(child: CircularProgressIndicator()),
           );
         }
@@ -60,14 +82,37 @@ class _ChatScreenState extends State<ChatScreen> {
         final group = groupSnapshot.data!;
         if (!group.members.contains(_currentAdmissionNo)) {
           return Scaffold(
-            appBar: AppBar(title: Text("Group Chat")),
+            appBar: AppBar(
+              title: Text("Group Chat", style: TextStyle(color: Colors.white)),
+              flexibleSpace: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.blueAccent, Colors.deepOrangeAccent],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+              ),
+            ),
             body: Center(child: Text("You are not a member of this group.")),
           );
         }
 
         return Scaffold(
           appBar: AppBar(
-            title: Text(group.name),
+            title: Text(
+              group.name,
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+            flexibleSpace: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.blueAccent, Colors.orangeAccent],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+            ),
             actions: [
               PopupMenuButton<String>(
                 onSelected: (value) {
@@ -88,16 +133,16 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
               if (group.admin == _currentAdmissionNo)
                 IconButton(
-                  icon: Icon(Icons.person_add),
+                  icon: Icon(Icons.person_add, color: Colors.white),
                   onPressed: _showAddMemberDialog,
                 ),
             ],
           ),
-          body: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                Expanded(
+          body: Column(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
                   child: StreamBuilder<List<Map<String, dynamic>>>(
                     stream: _chatService.getMessages(widget.groupId),
                     builder: (context, snapshot) {
@@ -123,6 +168,13 @@ class _ChatScreenState extends State<ChatScreen> {
                                 decoration: BoxDecoration(
                                   color: isSender ? Colors.orange.shade200 : Colors.blueAccent.shade100,
                                   borderRadius: BorderRadius.circular(15),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black12,
+                                      blurRadius: 5,
+                                      offset: Offset(2, 2),
+                                    ),
+                                  ],
                                 ),
                                 padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                                 child: Column(
@@ -132,12 +184,12 @@ class _ChatScreenState extends State<ChatScreen> {
                                       Text(
                                         message['senderName'] ?? 'Unknown',
                                         style: TextStyle(
-                                            fontWeight: FontWeight.bold, color: Colors.brown),
+                                            fontWeight: FontWeight.normal, color: Colors.brown),
                                       ),
-                                    SizedBox(height: 10,),
+                                    SizedBox(height: 1,),
                                     Text(
                                       message['message'] ?? '',
-                                      style: TextStyle(color: Colors.white,fontSize: 17,fontWeight: FontWeight.bold),
+                                      style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold),
                                     ),
                                   ],
                                 ),
@@ -149,55 +201,64 @@ class _ChatScreenState extends State<ChatScreen> {
                     },
                   ),
                 ),
-                Card(
-                  elevation: 10,
-                  child: Container(
-                    padding: const EdgeInsets.all(15.0),
-                    color: Colors.white,
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: _messageController,
-                            decoration: InputDecoration(
-                              hintText: 'Message',
-                              hintStyle: TextStyle(color: Colors.orange),
-                              contentPadding: EdgeInsets.only(left: 10, bottom: 5),
-                              border: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.orange, width: 2),
-                              ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.deepOrange, width: 2.5),
-                              ),
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.orange, width: 1),
-                              ),
-                            ),
-                            style: TextStyle(color: Colors.black),
-                          ),
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.send, color: Colors.orange),
-                          onPressed: () async {
-                            if (_messageController.text.trim().isEmpty) return;
-                            final messageText = _messageController.text.trim();
-                            final senderAdmissionNo = _currentAdmissionNo!;
-                            final senderName = await _chatService.getUserNameByAdmissionNo(senderAdmissionNo);
-                            await _chatService.sendMessage(
-                              widget.groupId, // Using groupId as chatId.
-                              senderAdmissionNo,
-                              messageText,
-                              senderName,
-                            );
-                            _messageController.clear();
-                          },
-                        ),
-                      ],
+              ),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20.0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 10,
+                      offset: Offset(0, -5),
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _messageController,
+                        decoration: InputDecoration(
+                          hintText: 'Message',
+                          hintStyle: TextStyle(color: Colors.orange),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(25),
+                            borderSide: BorderSide.none,
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey.shade200,
+                        ),
+                        style: TextStyle(color: Colors.black),
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    IconButton(
+                      icon: Icon(Icons.send, color: Colors.orangeAccent),
+                      onPressed: () async {
+                        if (_messageController.text.trim().isEmpty) return;
+                        final messageText = _messageController.text.trim();
+                        final senderAdmissionNo = _currentAdmissionNo!;
+                        final senderName = await _chatService.getUserNameByAdmissionNo(senderAdmissionNo);
+
+                        // Send the message
+                        await _chatService.sendMessage(
+                          widget.groupId, // Using groupId as chatId.
+                          senderAdmissionNo,
+                          messageText,
+                          senderName,
+                        );
+
+                        // Clear the input box
+                        _messageController.clear();
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         );
       },
@@ -218,7 +279,7 @@ class _ChatScreenState extends State<ChatScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text("Cancel"),
+              child: Text("Cancel",style: TextStyle(color: Colors.deepOrange),),
             ),
             ElevatedButton(
               onPressed: () async {
