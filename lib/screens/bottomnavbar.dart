@@ -56,7 +56,7 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
             CurrentIndex = index;
           });
         },
-        type: BottomNavigationBarType.shifting,
+        type: BottomNavigationBarType.fixed,
         currentIndex: CurrentIndex,
         selectedItemColor: Colors.orange,
         iconSize: 30,

@@ -71,133 +71,149 @@ class _PostScreenState extends State<PostScreen> {
       appBar: AppBar(
         title: Text("Create Post", style: TextStyle(color: Colors.white)),
         backgroundColor: Color(0xFFF58634),
-        automaticallyImplyLeading: false,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-
-              SizedBox(height: 30),
-              Card(
-                elevation: 6,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: TextFormField(
-                    controller: _contentController,
-                    decoration: InputDecoration(
-                      hintText: 'Write your post here...',
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: InputBorder.none,
-                    ),
-                    maxLines: 8,
-                    keyboardType: TextInputType.multiline,
-                    style: TextStyle(fontSize: 16, height: 1.5),
-                  ),
-                ),
-              ),
-              SizedBox(height: 40),
-              Card(
-                elevation: 5,
-                color: Color(0xFFF58634),
-                child: ElevatedButton.icon(
-                  onPressed: _pickImage,
-                  icon: Icon(Icons.add_a_photo),
-                  label: Text("Pick Image",style: TextStyle(color: Color(0xFFF58634)),),
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: Size(double.infinity, 50),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              if (kIsWeb && _webImage != null)
-                Padding(
-                  padding: const EdgeInsets.only(top: 10.0),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Image.memory(
-                      _webImage!,
-                      height: 200,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                )
-              else if (_image != null)
-                Padding(
-                  padding: const EdgeInsets.only(top: 10.0),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Image.file(
-                      _image!,
-                      height: 200,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                )
-              else
-                Padding(
-                  padding: const EdgeInsets.only(top: 10.0),
-                  child: Text(
-                    'No image selected.',
-                    style: TextStyle(color: Colors.grey[600]),
-                  ),
-                ),
-              SizedBox(height: 30),
-            ],
-          ),
+        iconTheme: const IconThemeData(
+          color: Colors.white,
+          size: 28,
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _isLoading
-            ? null
-            : () async {
-          setState(() => _isLoading = true);
+      body: LayoutBuilder(
+        builder: (context, constraints) => SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: constraints.maxHeight,
+            ),
+            child: IntrinsicHeight(
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  children: [
+                    // Image Picker Card
+                    GestureDetector(
+                      onTap: _pickImage,
+                      child: Container(
+                        width: double.infinity,
+                        height: 220,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF98BEFD),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: Colors.deepPurpleAccent.withOpacity(0.3),
+                            width: 2,
+                          ),
+                        ),
+                        child: Center(
+                          child: (_image != null || (kIsWeb && _webImage != null))
+                              ? (kIsWeb && _webImage != null
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(14),
+                                      child: Image.memory(
+                                        _webImage!,
+                                        width: double.infinity,
+                                        height: 220,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    )
+                                  : ClipRRect(
+                                      borderRadius: BorderRadius.circular(14),
+                                      child: Image.file(
+                                        _image!,
+                                        width: double.infinity,
+                                        height: 220,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ))
+                              : const Icon(Icons.add, size: 48, color: Colors.black54),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    // Note Text Field Card
+                    Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEAF0FF),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        child: SizedBox(
+                          height: 320,
+                          child: TextFormField(
+                            controller: _contentController,
+                            decoration: const InputDecoration(
+                              hintText: 'Write your thoughts here...',
+                              border: InputBorder.none,
+                            ),
+                            maxLines: null,
+                            expands: true,
+                            style: const TextStyle(fontSize: 16, color: Colors.black87),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const Spacer(),
+                    // Post Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 56,
+                      child: ElevatedButton.icon(
+                        onPressed: _isLoading
+                            ? null
+                            : () async {
+                                setState(() => _isLoading = true);
 
-          // Get the current user ID
-          String? userId = FirebaseAuth.instance.currentUser?.uid;
-          if (userId == null) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("You must be logged in to post")));
-            setState(() => _isLoading = false);
-            return;
-          }
+                                String? userId = FirebaseAuth.instance.currentUser?.uid;
+                                if (userId == null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text("You must be logged in to post")));
+                                  setState(() => _isLoading = false);
+                                  return;
+                                }
 
-          // Upload image and get the URL
-          String? imageUrl = await _uploadImage();
-          print("Post Image URL: $imageUrl"); // Print the image URL when creating a post
+                                String? imageUrl = await _uploadImage();
 
-          // Create the post
-          Post post = Post(
-            id: DateTime.now().toString(),
-            userId: userId,
-            content: _contentController.text,
-            timestamp: DateTime.now(),
-            imageUrl: imageUrl,
-          );
+                                Post post = Post(
+                                  id: DateTime.now().toString(),
+                                  userId: userId,
+                                  content: _contentController.text,
+                                  timestamp: DateTime.now(),
+                                  imageUrl: imageUrl,
+                                );
 
-          // Save the post to Firestore
-          await PostService().addPost(post);
+                                await PostService().addPost(post);
 
-          // Navigate back
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => BottomNavScreen()),
-          );
-        },
-        child: _isLoading
-            ? CircularProgressIndicator(color: Colors.white)
-            : Icon(Icons.post_add, color: Colors.white, size: 35),
-        backgroundColor: Color(0xFFF58634),
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => BottomNavScreen()),
+                                );
+                              },
+                        icon: _isLoading
+                            ? const SizedBox(
+                                width: 22,
+                                height: 22,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2.5,
+                                ),
+                              )
+                            : const Icon(Icons.arrow_forward, color: Colors.white),
+                        label: const Text(
+                          "POST",
+                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: 1),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFFF944D),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          elevation: 2,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
